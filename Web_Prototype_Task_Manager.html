@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Lady Task Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a2530 100%);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: var(--secondary);
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .tagline {
+            font-size: 16px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .task-form {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .task-list {
+            padding: 20px;
+        }
+        
+        .task-list h2 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            color: var(--primary);
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .task-item.completed {
+            border-left-color: var(--success);
+            opacity: 0.8;
+        }
+        
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #7f8c8d;
+        }
+        
+        .task-checkbox {
+            margin-right: 15px;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+        
+        .task-content {
+            flex-grow: 1;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .task-description {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .task-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .ai-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .ai-section h2 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ai-section h2 i {
+            color: var(--secondary);
+        }
+        
+        .ai-suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .suggestion-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-left: 3px solid var(--secondary);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .suggestion-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .suggestion-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .suggestion-card p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 600px) {
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-actions {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .ai-suggestions {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <div>
+                    <h1>Iron Lady Task Manager</h1>
+                    <p class="tagline">Empowering productivity with AI • Bangalore</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="app-container">
+            <div class="task-form">
+                <h2>Add New Task</h2>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Task Title</label>
+                        <input type="text" id="taskTitle" class="form-control" placeholder="What needs to be done?" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Description</label>
+                        <textarea id="taskDescription" class="form-control" rows="3" placeholder="Add details about this task..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </form>
+            </div>
+            
+            <div class="task-list">
+                <h2>Your Tasks</h2>
+                <div id="tasksContainer">
+                    <!-- Tasks will be dynamically inserted here -->
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No tasks yet</h3>
+                        <p>Add a task to get started</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-section">
+                <h2><i class="fas fa-robot"></i> AI Task Suggestions</h2>
+                <p>Based on your current tasks, our AI recommends these might be helpful:</p>
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+                <div class="ai-suggestions">
+                    <!-- AI suggestions will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const taskForm = document.getElementById('taskForm');
+            const taskTitle = document.getElementById('taskTitle');
+            const taskDescription = document.getElementById('taskDescription');
+            const tasksContainer = document.getElementById('tasksContainer');
+            
+            // Sample tasks for demonstration
+            let tasks = [
+                {
+                    id: 1,
+                    title: 'Complete project proposal',
+                    description: 'Finish the proposal for the client meeting on Friday',
+                    completed: false
+                },
+                {
+                    id: 2,
+                    title: 'Team meeting',
+                    description: 'Weekly team sync at 11 AM',
+                    completed: true
+                }
+            ];
+            
+            // Initialize the app
+            function init() {
+                renderTasks();
+                simulateAISuggestions();
+            }
+            
+            // Render tasks to the DOM
+            function renderTasks() {
+                if (tasks.length === 0) {
+                    tasksContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>No tasks yet</h3>
+                            <p>Add a task to get started</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                tasksContainer.innerHTML = '';
+                
+                tasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                    taskElement.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-id="${task.id}">
+                        <div class="task-content">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-description">${task.description}</div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-secondary edit-btn" data-id="${task.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-secondary delete-btn" data-id="${task.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    tasksContainer.appendChild(taskElement);
+                });
+                
+                // Add event listeners to checkboxes
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const taskId = parseInt(this.getAttribute('data-id'));
+                        toggleTaskComplete(taskId);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const taskId = parseInt(this.getAttribute('data-id'));
+                        deleteTask(taskId);
+                    });
+                });
+                
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const taskId = parseInt(this.getAttribute('data-id'));
+                        editTask(taskId);
+                    });
+                });
+            }
+            
+            // Add a new task
+            function addTask(title, description) {
+                const newTask = {
+                    id: tasks.length > 0 ? Math.max(...tasks.map(task => task.id)) + 1 : 1,
+                    title: title,
+                    description: description,
+                    completed: false
+                };
+                
+                tasks.push(newTask);
+                renderTasks();
+                simulateAISuggestions(); // Refresh AI suggestions
+            }
+            
+            // Toggle task completion status
+            function toggleTaskComplete(taskId) {
+                tasks = tasks.map(task => {
+                    if (task.id === taskId) {
+                        return { ...task, completed: !task.completed };
+                    }
+                    return task;
+                });
+                
+                renderTasks();
+            }
+            
+            // Delete a task
+            function deleteTask(taskId) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                renderTasks();
+                simulateAISuggestions(); // Refresh AI suggestions
+            }
+            
+            // Edit a task (simplified version)
+            function editTask(taskId) {
+                const task = tasks.find(task => task.id === taskId);
+                
+                // In a real app, you would show a modal or edit form
+                const newTitle = prompt('Edit task title:', task.title);
+                if (newTitle === null) return;
+                
+                const newDescription = prompt('Edit task description:', task.description);
+                
+                tasks = tasks.map(t => {
+                    if (t.id === taskId) {
+                        return {
+                            ...t,
+                            title: newTitle,
+                            description: newDescription
+                        };
+                    }
+                    return t;
+                });
+                
+                renderTasks();
+            }
+            
+            // Simulate AI-generated task suggestions
+            function simulateAISuggestions() {
+                const aiSection = document.querySelector('.ai-suggestions');
+                const loading = document.querySelector('.loading');
+                
+                // Show loading spinner
+                loading.style.display = 'flex';
+                aiSection.innerHTML = '';
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    
+                    // Sample AI suggestions based on current tasks
+                    const suggestions = [
+                        {
+                            title: 'Review completed tasks',
+                            description: 'Schedule time to review what you\'ve accomplished'
+                        },
+                        {
+                            title: 'Break down large tasks',
+                            description: 'Consider splitting bigger tasks into smaller subtasks'
+                        },
+                        {
+                            title: 'Schedule focus time',
+                            description: 'Block time for deep work on important tasks'
+                        }
+                    ];
+                    
+                    // If there are many completed tasks, suggest a different AI recommendation
+                    const completedCount = tasks.filter(task => task.completed).length;
+                    if (completedCount > 3) {
+                        suggestions.push({
+                            title: 'Weekly review',
+                            description: 'Schedule a weekly review to reflect on progress'
+                        });
+                    }
+                    
+                    // If there are many incomplete tasks, suggest prioritization
+                    const incompleteCount = tasks.filter(task => !task.completed).length;
+                    if (incompleteCount > 4) {
+                        suggestions.push({
+                            title: 'Prioritize tasks',
+                            description: 'Use Eisenhower Matrix to prioritize your tasks'
+                        });
+                    }
+                    
+                    // Render suggestions
+                    suggestions.forEach(suggestion => {
+                        const suggestionEl = document.createElement('div');
+                        suggestionEl.className = 'suggestion-card';
+                        suggestionEl.innerHTML = `
+                            <h3>${suggestion.title}</h3>
+                            <p>${suggestion.description}</p>
+                        `;
+                        
+                        // Add click handler to add as a task
+                        suggestionEl.addEventListener('click', () => {
+                            addTask(suggestion.title, suggestion.description);
+                        });
+                        
+                        aiSection.appendChild(suggestionEl);
+                    });
+                }, 1500);
+            }
+            
+            // Form submission handler
+            taskForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = taskTitle.value.trim();
+                const description = taskDescription.value.trim();
+                
+                if (title) {
+                    addTask(title, description);
+                    
+                    // Reset form
+                    taskTitle.value = '';
+                    taskDescription.value = '';
+                    taskTitle.focus();
+                }
+            });
+            
+            // Initialize the app
+            init();
+        });
+    </script>
+</body>
+</html>
