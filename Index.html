@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Lady Task Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a2530 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo i {
+            font-size: 32px;
+            color: var(--secondary);
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+        }
+        
+        .logo h1 {
+            font-size: 36px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tagline {
+            font-size: 18px;
+            margin-top: 10px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .location {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #2c3e50 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .panel-header i {
+            font-size: 24px;
+        }
+        
+        .panel-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .panel-content {
+            padding: 25px;
+        }
+        
+        .task-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .task-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .priority-select {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .priority-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .priority-option.selected {
+            border-color: var(--accent);
+            background-color: rgba(52, 152, 219, 0.1);
+            font-weight: 600;
+        }
+        
+        .priority-low.selected {
+            border-color: var(--success);
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .priority-medium.selected {
+            border-color: var(--warning);
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+        
+        .priority-high.selected {
+            border-color: var(--secondary);
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #2980b9 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-ai {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(155, 89, 182, 0.4);
+        }
+        
+        .task-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border-left: 5px solid var(--accent);
+            transition: transform 0.2s, box-shadow 0.2s;
+            gap: 15px;
+        }
+        
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .task-item.completed {
+            border-left-color: var(--success);
+            opacity: 0.9;
+        }
+        
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: var(--gray);
+        }
+        
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+        
+        .task-content {
+            flex-grow: 1;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .priority-badge {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: var(--accent);
+            color: white;
+        }
+        
+        .priority-high .priority-badge {
+            background: var(--secondary);
+        }
+        
+        .priority-medium .priority-badge {
+            background: var(--warning);
+        }
+        
+        .priority-low .priority-badge {
+            background: var(--success);
+        }
+        
+        .task-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .task-date {
+            font-size: 12px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .task-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            background: #eee;
+            color: var(--dark);
+            transition: all 0.2s;
+        }
+        
+        .task-actions button:hover {
+            background: #ddd;
+        }
+        
+        .ai-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-header i {
+            font-size: 32px;
+            color: #ffcc00;
+        }
+        
+        .ai-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        
+        .ai-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .ai-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .ai-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .ai-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ai-card p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .ai-suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .suggestion-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .suggestion-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .suggestion-card h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 15px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .summary-content {
+            line-height: 1.6;
+        }
+        
+        .summary-content ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .summary-content li {
+            margin-bottom: 8px;
+        }
+        
+        .github-section {
+            margin-top: 40px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .github-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .github-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .github-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .github-file {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .github-file h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .github-file pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <h1>Iron Lady Task Manager</h1>
+            </div>
+            <p class="tagline">Empowering Productivity with AI-Powered Features</p>
+            <div class="location">Bangalore, India</div>
+        </header>
+        
+        <div class="app-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-plus-circle"></i>
+                    <h2>Add New Task</h2>
+                </div>
+                <div class="panel-content">
+                    <form class="task-form" id="taskForm">
+                        <div class="form-group">
+                            <label for="taskTitle">Task Title</label>
+                            <input type="text" id="taskTitle" class="form-control" placeholder="What needs to be done?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDescription">Description</label>
+                            <textarea id="taskDescription" class="form-control" placeholder="Add details about this task..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <div class="priority-select">
+                                <div class="priority-option priority-low" data-value="low">Low</div>
+                                <div class="priority-option priority-medium selected" data-value="medium">Medium</div>
+                                <div class="priority-option priority-high" data-value="high">High</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDueDate">Due Date</label>
+                            <input type="date" id="taskDueDate" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                        <button type="button" class="btn btn-ai" id="aiGenerateBtn">
+                            <i class="fas fa-robot"></i> AI Generate Task Ideas
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-tasks"></i>
+                    <h2>Your Tasks</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="task-list" id="tasksContainer">
+                        <!-- Tasks will be dynamically inserted here -->
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>No tasks yet</h3>
+                            <p>Add a task to get started</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalTasks">0</div>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completedTasks">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="pendingTasks">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-section">
+                <div class="ai-header">
+                    <i class="fas fa-robot"></i>
+                    <h2>AI-Powered Features</h2>
+                </div>
+                <div class="ai-content">
+                    <div class="ai-card">
+                        <h3><i class="fas fa-lightbulb"></i> AI Task Suggestions</h3>
+                        <p>Based on your current tasks, our AI recommends:</p>
+                        <div class="ai-suggestions" id="aiSuggestions">
+                            <!-- AI suggestions will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="ai-card">
+                        <h3><i class="fas fa-file-alt"></i> AI Summary</h3>
+                        <div class="summary-content" id="aiSummary">
+                            <!-- AI summary will be inserted here -->
+                            <p>Your task summary will appear here once you have tasks.</p>
+                        </div>
+                        <button class="btn btn-ai" id="generateSummaryBtn">
+                            <i class="fas fa-sync"></i> Generate Summary
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="github-section">
+            <h2><i class="fab fa-github"></i> GitHub Repository Files</h2>
+            <div class="github-content">
+                <div class="github-file">
+                    <h3>README.md</h3>
+                    <pre># Iron Lady Task Manager
+
+A sleek, AI-powered task management application built for Iron Lady Company, Bangalore.
+
+## Features
+
+- **CRUD Operations**: Create, read, update, and delete tasks
+- **AI-Powered Features**: 
+  - AI task generation
+  - Smart task suggestions
+  - Automated task summarization
+- **Priority Levels**: Organize tasks by priority (Low, Medium, High)
+- **Due Dates**: Set and track task deadlines
+- **Statistics**: View completion statistics and progress
+- **Responsive Design**: Works on desktop and mobile devices
+
+## Technologies Used
+
+- HTML5
+- CSS3 with Flexbox and Grid
+- JavaScript (ES6+)
+- Font Awesome Icons
+- Google Fonts
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Anubhavsarkar003/iron-lady-task-manager.git
